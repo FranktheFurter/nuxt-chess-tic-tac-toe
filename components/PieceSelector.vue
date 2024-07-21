@@ -11,27 +11,31 @@
       @click="$emit('select-piece', piece)"
       :disabled="count === 0 || mode === 'move'"
     >
-      <div
-        :class="`text-2xl ${
-          currentPlayer === WHITE ? 'text-blue-500' : 'text-red-500'
-        }`"
-      >
-        {{ piece }}
-      </div>
+      <ChessPiece :type="piece" :color="currentPlayer" />
       <div>{{ count }}</div>
     </button>
   </div>
 </template>
 
 <script>
-import { defineComponent } from 'vue';
-import { WHITE } from './constants';
+import { defineComponent } from "vue";
+import { WHITE } from "./constants";
+import ChessPiece from "./ChessPiece.vue";
 
 export default defineComponent({
-  props: ['playerPieces', 'selectedPiece', 'currentPlayer', 'mode'],
-  emits: ['select-piece'],
+  components: { ChessPiece },
+  props: ["playerPieces", "selectedPiece", "currentPlayer", "mode"],
+  emits: ["select-piece"],
   setup() {
     return { WHITE };
   },
 });
 </script>
+
+<style>
+.button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+</style>

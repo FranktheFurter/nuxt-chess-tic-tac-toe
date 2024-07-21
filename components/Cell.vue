@@ -4,23 +4,18 @@
     :class="{ 'bg-yellow-200': isSelected }"
     @click="$emit('click')"
   >
-    <div
-      v-if="cell"
-      :class="`text-3xl ${
-        cell.color === WHITE ? 'text-blue-500' : 'text-red-500'
-      }`"
-    >
-      {{ cell.piece }}
-    </div>
+    <ChessPiece v-if="cell" :type="cell.piece" :color="cell.color" />
   </div>
 </template>
 
 <script>
-import { defineComponent } from 'vue';
-import { WHITE } from './constants';
+import { defineComponent } from "vue";
+import { WHITE } from "./constants";
+import ChessPiece from "./ChessPiece.vue";
 
 export default defineComponent({
-  props: ['cell', 'isSelected'],
+  components: { ChessPiece },
+  props: ["cell", "isSelected"],
   setup() {
     return { WHITE };
   },

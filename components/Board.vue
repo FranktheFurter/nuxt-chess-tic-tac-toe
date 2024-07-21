@@ -13,13 +13,13 @@
 </template>
 
 <script>
-import { defineComponent } from 'vue';
-import Cell from './Cell.vue';
+import { defineComponent } from "vue";
+import Cell from "./Cell.vue";
 
 export default defineComponent({
   components: { Cell },
-  props: ['board', 'selectedCell', 'currentPlayer'],
-  emits: ['cell-click'],
+  props: ["board", "selectedCell", "currentPlayer"],
+  emits: ["cell-click"],
   setup(props) {
     const isSelectedCell = (rowIndex, colIndex) => {
       return (
