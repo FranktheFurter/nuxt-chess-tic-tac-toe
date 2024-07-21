@@ -5,7 +5,7 @@ export default defineNuxtConfig({
     baseURL: "/nuxt-chess-tic-tac-toe/",
   },
 
-  ssr: false,
+  ssr: true,
 
   nitro: {
     preset: "static",
