@@ -1,1 +1,0 @@
-import{_ as o}from"./Bgo99nHv.js";import{_ as n,c,b as s,w as a,a as e,o as _,d as r}from"./B2YOJl-Y.js";const i={},d=e("h1",null,"Welcome to Nuxt Chess Tic-Tac-Toe",-1),l=e("p",null,"This is the index page.",-1);function m(u,x){const t=o;return _(),c("div",null,[d,l,s(t,{to:"/game"},{default:a(()=>[r("Go to Game")]),_:1})])}const h=n(i,[["render",m]]);export{h as default};
