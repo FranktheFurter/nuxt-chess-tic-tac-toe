@@ -64,7 +64,13 @@ export default {
       if (
         piece &&
         piece.color === currentPlayer.value &&
-        isValidMove([fromRow, fromCol], [toRow, toCol], piece.piece)
+        isValidMove(
+          [fromRow, fromCol],
+          [toRow, toCol],
+          piece.piece,
+          piece.color,
+          board.value
+        )
       ) {
         board.value[toRow][toCol] = piece;
         board.value[fromRow][fromCol] = null;

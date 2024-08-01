@@ -1,31 +1,86 @@
-import { PAWN, ROOK, BISHOP, KNIGHT, QUEEN } from "./constants";
+import { PAWN, ROOK, BISHOP, KNIGHT, QUEEN, WHITE, BLACK } from "./constants";
 
-export function isValidMove(from, to, piece) {
+export function isValidMove(from, to, piece, color, board) {
   const [fromRow, fromCol] = from;
   const [toRow, toCol] = to;
-  const rowDiff = Math.abs(toRow - fromRow);
-  const colDiff = Math.abs(toCol - fromCol);
+  const rowDiff = toRow - fromRow;
+  const colDiff = toCol - fromCol;
+  const absRowDiff = Math.abs(rowDiff);
+  const absColDiff = Math.abs(colDiff);
+
+  // Check if the destination square is occupied by a piece of the same color
+  if (board[toRow][toCol] && board[toRow][toCol].color === color) {
+    return false;
+  }
 
   switch (piece) {
     case PAWN:
-      return rowDiff === 1 && colDiff === 0;
+      if (color === WHITE) {
+        // White pawns move up (negative row difference)
+        if (rowDiff === -1 && colDiff === 0 && !board[toRow][toCol]) {
+          return true; // Regular move
+        }
+        if (rowDiff === -1 && absColDiff === 1 && board[toRow][toCol]) {
+          return true; // Capture diagonally
+        }
+      } else {
+        // Black pawns move down (positive row difference)
+        if (rowDiff === 1 && colDiff === 0 && !board[toRow][toCol]) {
+          return true; // Regular move
+        }
+        if (rowDiff === 1 && absColDiff === 1 && board[toRow][toCol]) {
+          return true; // Capture diagonally
+        }
+      }
+      return false;
+
     case ROOK:
-      return (rowDiff === 0 && colDiff > 0) || (colDiff === 0 && rowDiff > 0);
+      return (
+        ((absRowDiff === 0 && absColDiff > 0) ||
+          (absColDiff === 0 && absRowDiff > 0)) &&
+        !isPathBlocked(from, to, board)
+      );
+
     case BISHOP:
-      return rowDiff === colDiff;
+      return absRowDiff === absColDiff && !isPathBlocked(from, to, board);
+
     case KNIGHT:
       return (
-        (rowDiff === 2 && colDiff === 1) || (rowDiff === 1 && colDiff === 2)
+        (absRowDiff === 2 && absColDiff === 1) ||
+        (absRowDiff === 1 && absColDiff === 2)
       );
+
     case QUEEN:
       return (
-        (rowDiff === 0 && colDiff > 0) ||
-        (colDiff === 0 && rowDiff > 0) ||
-        rowDiff === colDiff
+        ((absRowDiff === 0 && absColDiff > 0) ||
+          (absColDiff === 0 && absRowDiff > 0) ||
+          absRowDiff === absColDiff) &&
+        !isPathBlocked(from, to, board)
       );
+
     default:
       return false;
   }
+}
+
+function isPathBlocked(from, to, board) {
+  const [fromRow, fromCol] = from;
+  const [toRow, toCol] = to;
+  const rowStep = Math.sign(toRow - fromRow);
+  const colStep = Math.sign(toCol - fromCol);
+
+  let currentRow = fromRow + rowStep;
+  let currentCol = fromCol + colStep;
+
+  while (currentRow !== toRow || currentCol !== toCol) {
+    if (board[currentRow][currentCol]) {
+      return true; // Path is blocked
+    }
+    currentRow += rowStep;
+    currentCol += colStep;
+  }
+
+  return false; // Path is clear
 }
 
 export function checkWin(board) {
@@ -82,6 +137,5 @@ export function checkWin(board) {
       return board[a[0]][a[1]].color;
     }
   }
-
   return null;
 }
