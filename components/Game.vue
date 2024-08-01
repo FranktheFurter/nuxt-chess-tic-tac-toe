@@ -6,16 +6,18 @@
       :board="board"
       :selectedCell="selectedCell"
       :currentPlayer="currentPlayer"
+      :mode="mode"
       @cell-click="handleCellClick"
+      @switch-to-move="switchToMoveMode"
     />
     <PieceSelector
       :playerPieces="playerPieces[currentPlayer]"
       :selectedPiece="selectedPiece"
       :currentPlayer="currentPlayer"
       :mode="mode"
-      @select-piece="setSelectedPiece"
+      @select-piece="handlePieceSelect"
     />
-    <ModeSelector :mode="mode" @set-mode="setMode" />
+    <div class="mt-4 text-lg">Current Mode: {{ mode }}</div>
   </div>
 </template>
 
@@ -23,7 +25,6 @@
 import { ref, reactive } from "vue";
 import Board from "./Board.vue";
 import PieceSelector from "./PieceSelector.vue";
-import ModeSelector from "./ModeSelector.vue";
 import { WHITE, BLACK, initialBoard, initialPieces } from "./constants";
 import { isValidMove, checkWin } from "./gameLogic";
 
@@ -31,7 +32,6 @@ export default {
   components: {
     Board,
     PieceSelector,
-    ModeSelector,
   },
   setup() {
     const board = ref(initialBoard);
@@ -55,7 +55,7 @@ export default {
         playerPieces[currentPlayer.value][selectedPiece.value]--;
         selectedPiece.value = null;
         checkWinState();
-        currentPlayer.value = currentPlayer.value === WHITE ? BLACK : WHITE;
+        switchPlayer();
       }
     }
 
@@ -70,7 +70,8 @@ export default {
         board.value[fromRow][fromCol] = null;
         selectedCell.value = null;
         checkWinState();
-        currentPlayer.value = currentPlayer.value === WHITE ? BLACK : WHITE;
+        switchPlayer();
+        mode.value = "place";
       }
     }
 
@@ -80,25 +81,37 @@ export default {
       } else if (mode.value === "move") {
         if (selectedCell.value) {
           movePiece(selectedCell.value[0], selectedCell.value[1], row, col);
-        } else if (
-          board.value[row][col] &&
-          board.value[row][col].color === currentPlayer.value
-        ) {
-          selectedCell.value = [row, col];
+        } else {
+          // This shouldn't happen, but just in case
+          switchToMoveMode(row, col);
         }
       }
+    }
+
+    function switchToMoveMode(row, col) {
+      const cell = board.value[row][col];
+      if (cell && cell.color === currentPlayer.value) {
+        mode.value = "move";
+        selectedCell.value = [row, col];
+        selectedPiece.value = null;
+      }
+    }
+
+    function handlePieceSelect(piece) {
+      if (mode.value === "move") {
+        mode.value = "place";
+        selectedCell.value = null;
+      }
+
+      selectedPiece.value = selectedPiece.value === piece ? null : piece;
     }
 
     function checkWinState() {
       winner.value = checkWin(board.value);
     }
 
-    function setSelectedPiece(piece) {
-      selectedPiece.value = piece;
-    }
-
-    function setMode(newMode) {
-      mode.value = newMode;
+    function switchPlayer() {
+      currentPlayer.value = currentPlayer.value === WHITE ? BLACK : WHITE;
     }
 
     return {
@@ -109,11 +122,9 @@ export default {
       playerPieces,
       winner,
       mode,
-      WHITE,
-      BLACK,
       handleCellClick,
-      setSelectedPiece,
-      setMode,
+      handlePieceSelect,
+      switchToMoveMode,
     };
   },
 };

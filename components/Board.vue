@@ -6,7 +6,9 @@
         :key="colIndex"
         :cell="cell"
         :isSelected="isSelectedCell(rowIndex, colIndex)"
-        @click="$emit('cell-click', rowIndex, colIndex)"
+        :currentPlayer="currentPlayer"
+        :mode="mode"
+        @click="handleCellClick(rowIndex, colIndex)"
       />
     </div>
   </div>
@@ -18,9 +20,9 @@ import Cell from "./Cell.vue";
 
 export default defineComponent({
   components: { Cell },
-  props: ["board", "selectedCell", "currentPlayer"],
-  emits: ["cell-click"],
-  setup(props) {
+  props: ["board", "selectedCell", "currentPlayer", "mode"],
+  emits: ["cell-click", "switch-to-move"],
+  setup(props, { emit }) {
     const isSelectedCell = (rowIndex, colIndex) => {
       return (
         props.selectedCell &&
@@ -29,7 +31,20 @@ export default defineComponent({
       );
     };
 
-    return { isSelectedCell };
+    const handleCellClick = (rowIndex, colIndex) => {
+      const cell = props.board[rowIndex][colIndex];
+      if (
+        cell &&
+        cell.color === props.currentPlayer &&
+        props.mode === "place"
+      ) {
+        emit("switch-to-move", rowIndex, colIndex);
+      } else {
+        emit("cell-click", rowIndex, colIndex);
+      }
+    };
+
+    return { isSelectedCell, handleCellClick };
   },
 });
 </script>
